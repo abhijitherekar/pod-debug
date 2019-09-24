@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: default
+spec:
+  containers:
+  - image: docker.io/busybox
+    command:
+      - sleep
+      - "7200"
+    imagePullPolicy: IfNotPresent
+    name: busybox
+  restartPolicy: Always

@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: pod6
+  name: pod6
+spec:
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: nginx
+    resources:
+      limits:
+        cpu: 1000m
+        memory: "100Mi"
+      requests:
+        cpu: 5m
+  - command:
+    - /bin/sleep
+    - 365d
+    image: ubuntu
+    imagePullPolicy: Always
+    name: ubuntu
+    resources:
+      limits:
+        cpu: 1000m
+        memory: "100Mi"
+      requests:
+        cpu: 5m
+  - command:
+    - /bin/sleep
+    - 365d
+    image: alpine
+    imagePullPolicy: Always
+    name: alpine
+    resources:
+      limits:
+        cpu: 1000m
+        memory: "100Mi"
+      requests:
+        cpu: 5m
+  initContainers:
+  - command:
+    - /bin/sleep
+    - "10"
+    image: centos
+    imagePullPolicy: Always
+    name: centos
+    resources:
+      requests:
+        cpu: 5m
+  nodeName: gke-abhijit-standard-1-default-pool-b736b064-xz89

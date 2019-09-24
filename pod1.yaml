@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: pod1
+  name: pod1
+spec:
+  nodeName: gke-abhijit-standard-1-default-pool-b736b064-xz89
+  containers:
+  - image: nginxasdfasdf
+    imagePullPolicy: Always
+    name: nginx
+    resources:
+      limits:
+        cpu: 1000m
+        memory: "100Mi"
+      requests:
+        cpu: 5m
