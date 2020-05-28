@@ -2,59 +2,76 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
+
+	"gopkg.in/yaml.v2"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
-
-// func echoServer(c net.Conn) {
-// 	for {
-// 		buf := make([]byte, 512)
-// 		nr, err := c.Read(buf)
-// 		if err != nil {
-// 			return
-// 		}
-
-// 		data := buf[0:nr]
-// 		println("Server got:", string(data))
-// 		_, err = c.Write(data)
-// 		if err != nil {
-// 			log.Fatal("Writing client error: ", err)
-// 		}
-// 	}
-// }
 
 func printhello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
 }
 func main() {
+	c, err := NewConfigMap()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("config: ", *c)
+	}
 	log.Println("Starting echo server on : ", runtime.GOOS)
 	http.HandleFunc("/", printhello)
-	http.ListenAndServe(":80", nil)
+	http.ListenAndServe(":80", nil) // nolint
 }
 
-// 	//addr, err := net.ResolveTCPAddr("TCP", "")
-// 	os.Remove("@test")
-// 	ln, err := net.Listen("unix", "@test")
-// 	if err != nil {
-// 		log.Fatal("Listen error: ", err)
-// 	}
-// 	fmt.Println(ln.Addr())
-// 	sigc := make(chan os.Signal, 1)
-// 	signal.Notify(sigc, os.Interrupt, syscall.SIGTERM)
-// 	go func(ln net.Listener, c chan os.Signal) {
-// 		sig := <-c
-// 		log.Printf("Caught signal %s: shutting down.", sig)
-// 		ln.Close()
-// 		os.Exit(0)
-// 	}(ln, sigc)
+// ControllerOptions configuration
+type ControllerOptions struct {
+	Services bool `yaml:"services"`
+}
 
-// 	for {
-// 		fd, err := ln.Accept()
-// 		if err != nil {
-// 			log.Fatal("Accept error: ", err)
-// 		}
+// Config struct contains operator controller configuration
+type Config struct {
+	ControllerOptions ControllerOptions `yaml:"controller"`
+}
 
-// 		go echoServer(fd)
-// 	}
-// }
+// Load loads configuration from config file
+func (c *Config) Load() error {
+	fmt.Println("in load")
+	files, err := ioutil.ReadDir("/tmpdir")
+	if err != nil {
+		logf.Log.WithName("configmap").Error(err, "error while reading")
+		return err
+	}
+	for _, f := range files {
+		fmt.Println(f.Name())
+	}
+	fmt.Println("list over")
+	file, err := os.Open("/tmpdir/aporeto-config.yaml")
+	if err != nil {
+		logf.Log.WithName("configmap").Error(err, " could not open the file")
+		return err
+	}
+	b, err := ioutil.ReadAll(file)
+	if err != nil {
+		logf.Log.WithName("configmap").Error(err, "error while reading")
+		return err
+	}
+	fmt.Println("COnfig: ", string(b))
+	if len(b) != 0 {
+		return yaml.Unmarshal(b, c)
+	}
+	return nil
+}
+
+// NewConfigMap creates new config object
+func NewConfigMap() (*Config, error) {
+	c := &Config{}
+	if err := c.Load(); err != nil {
+		return c, err
+	}
+
+	return c, nil
+}
