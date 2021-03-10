@@ -9,4 +9,7 @@ spec:
   - image: herekar/abhi-server:14
     imagePullPolicy: IfNotPresent
     name: server
+    securityContext:
+      capabilities:
+        add: ["NET_ADMIN"]
   restartPolicy: Always
