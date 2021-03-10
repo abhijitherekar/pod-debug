@@ -1,10 +1,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: server
+  name: server-2
+  labels:
+    app: abhi
 spec:
   containers:
-  - image: gcr.io/aporetodev/abhi-server
+  - image: herekar/abhi-server:14
     imagePullPolicy: IfNotPresent
     name: server
   restartPolicy: Always

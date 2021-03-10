@@ -13,18 +13,12 @@ import (
 )
 
 func printhello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
+	fmt.Fprintf(w, "Hello server I am client, %s!", r.URL.Path[1:])
 }
 func main() {
-	c, err := NewConfigMap()
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("config: ", *c)
-	}
 	log.Println("Starting echo server on : ", runtime.GOOS)
 	http.HandleFunc("/", printhello)
-	http.ListenAndServe(":80", nil) // nolint
+	http.ListenAndServe(":8080", nil) // nolint
 }
 
 // ControllerOptions configuration
